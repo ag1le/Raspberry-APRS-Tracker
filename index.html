@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<title>Nokia Maps Tracking Example</title>
+<script src="http://api.maps.nokia.com/2.1.1/jsl.js" type="text/javascript" charset="utf-8"/></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script> google.load("jquery", "1.7.1"); </script>
+
+
+<script type "text/javascript">
+function my_track() {
+ mycallsign=document.forms["frm1"]["callsign"].value;
+ track();
+ return false;
+};
+
+function track() {
+ var i; 
+ var myquery = encodeURIComponent('select * from json where url="http://api.aprs.fi/api/get?name='+mycallsign+'&what=loc&apikey=1234567890APIKEY&format=json"');
+ jQuery.ajax({
+        type: 'GET',
+        url: 'http://query.yahooapis.com/v1/public/yql?q='+ myquery +'&format=json&callback=?',
+        dataType: 'jsonp',  //this is needed
+        success: function(data) {
+                data = data.query.results.json;
+                lat = data.entries.lat*1;
+                lng = data.entries.lng*1;
+		if (data.found >1) {
+			for (i = 0; i=i+2; i<=data.found){
+				routeArr[i] = data.entries[i].lat*1; 
+				routeArr[i+1] = data.entries[i].lng*1;
+			};
+		alert(routeArr[0]+' '+routeArr[1]+' '+routeArr[2]+' '+routeArr[3]);
+		};
+                render_map_now();
+		return false;
+        }
+ });
+};
+
+</script>
+<form id="frm1" name="frm1" >
+<div id="panel_left" style="left: 80%; height: 100%; width: 20%; position: relative;">
+<p>LOCATION DATA BY <a href="http://aprs.fi"> aprs.fi</a>i</p>
+<p><input type="text" name="callsign" value=""/>
+<input type="submit" value="Find" onclick="return my_track();"/></p>
+<p><input type="text" name="fence" value="2000"/>
+<input type="submit" value="GeoFence" onclick="return set_fence();" /></p>
+<p><input type="button" value="Track" onclick="return set_fence();" /></p>
+</div>
+</form>
+
+</head>
+<div id="map" style="z-index: -1; left:0px; top:0px; width: 80%; height: 100%; position: absolute;"></div>
+<body>
+
+<script type="text/javascript">
+
+// set default location to Berlin
+var lat = 52.53096;
+var lng = 13.38485;
+var routeArr =[52.53096,13.38485,13.38485,52.53096];
+var mycallsign;
+var map = 0; 
+
+var mapContainer = document.getElementById("map");
+    //one map containers are available in this example
+var components = [
+		new nokia.maps.map.component.ZoomBar(), 
+		new nokia.maps.map.component.Behavior(),
+		new nokia.maps.map.component.TypeSelector(),
+		new nokia.maps.map.component.Traffic(),
+		new nokia.maps.map.component.PublicTransport(),
+		new nokia.maps.map.component.Overview(),
+		new nokia.maps.map.component.ScaleBar(),
+		new nokia.maps.map.component.RightClick(),
+    ];
+
+
+// Set the authentication token, which is needed by the web-services to authenticate your application.
+//ovi.mapsapi.util.ApplicationContext.set("authenticationToken","<Token>");
+
+function set_fence(){
+
+ 	var myradius=document.forms["frm1"]["fence"].value;
+	map.objects.add(new nokia.maps.map.Circle(
+		// Place the circle center here
+		[lat,lng],
+		// Radius of geofence
+		myradius,
+		{
+			color: "#823f",
+			fillColor: "#2387",
+			width: 2
+		}
+	));
+	map.update(-1,true);
+	return false;
+};
+
+function add_map_marker(){
+var marker = new nokia.maps.map.Marker(
+	new nokia.maps.geo.Coordinate(lat,lng),{
+	title: "marker",
+	visibility: true,
+	icon: "http://api.maps.nokia.com/2.1.1/playground/examples/res/markerTruck.png",
+//	icon: "http://media.linkedin.com/mpr/mpr/shrink_80_80/p/2/000/014/29c/0d11d41.jpg",
+	// Offset the top left icon corner so that it's
+	// Centered above the coordinate
+	anchor: new nokia.maps.util.Point(32, 32) 
+});
+map.objects.add(marker);
+
+}
+
+function render_map(){
+        // check if map does not exist - create one
+	if (map == 0){
+		map = (window.display = new nokia.maps.map.Display(mapContainer, {
+                components: components,
+                zoomLevel: 14,
+                fading: 250, // fading duration of tiles in miliseconds
+                center: [lat, lng]
+           }));
+	   add_map_marker();	
+	} else { // already created - just set center and refresh
+	map.setCenter([lat,lng]);
+	add_map_marker();
+	map.update(-1, true);
+	};
+	
+}
+
+function render_map_now() {
+
+    if (nokia.maps.search.Manager) {
+        components.push(new nokia.maps.search.component.SearchComponent());
+        components.push(new nokia.maps.search.component.RightClick());
+    };
+
+    if (nokia.maps.routing.Manager) {
+
+        if (nokia.maps.search.Manager) {
+            components.push(new nokia.maps.routing.component.RouteComponent());
+            components.push(new nokia.maps.routing.component.RightClick());
+        };
+
+        if (nokia.maps.map && nokia.maps.map.Display) {
+		render_map();
+			
+	};
+    };
+};
+
+</script>
+</body>
+</html>
