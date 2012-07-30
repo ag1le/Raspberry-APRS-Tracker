@@ -1,0 +1,28 @@
+APRS Tracker for Raspberry Pi 
+Copyright (C) 2012  Mauri Niininen AG1LE
+
+A simple Javascript based  web page that uses  APRS.FI  JSON API and Nokia Maps API to find 
+the latest position of an APRS enabled ham radio station. 
+
+You need to sign-up  to APRS.FI  and get an API key from here: http://aprs.fi/page/api
+
+Then edit the index.html file and insert your API key in the following line - replace xxxxxxxx:
+
+var myquery = encodeURIComponent('select * from json where url="http://api.aprs.fi/api/get?name='+mycallsign+'&what=loc&apikey=xxxxxxxx&format=json"'); 
+
+
+NOTE:  This is prototype code to demonstrate mashup of multiple APIs 
+
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
