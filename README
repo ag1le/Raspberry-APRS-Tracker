@@ -11,7 +11,16 @@ Then edit the index.html file and insert your API key in the following line - re
 var myquery = encodeURIComponent('select * from json where url="http://api.aprs.fi/api/get?name='+mycallsign+'&what=loc&apikey=xxxxxxxx&format=json"'); 
 
 
+Try entering for example W1MRA-C  in the "Find"  field. 
+You should get a map of Boston with station W1MRA-C located on or around Prudential Center. 
+
+"GeoFence" will draw a circle around the found station. No other functionality has been implemented yet. 
+
+"Track"  does the same as "GeoFence" button in the first release.
+
 NOTE:  This is prototype code to demonstrate mashup of multiple APIs 
+
+
 
 
     This program is free software: you can redistribute it and/or modify
